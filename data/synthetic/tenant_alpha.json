@@ -1,0 +1,66 @@
+[
+  {
+    "doc_id": "ALPHA-TKT-001",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "ticket",
+    "title": "VPN connection fails after password reset",
+    "content": "User reports VPN client throws error code 691 after a password reset. Steps to reproduce: 1) Reset domain password via self-service portal 2) Attempt VPN login with new credentials 3) Authentication fails with error 691. Workaround: IT helpdesk re-provisions the VPN token. Root cause: cached Kerberos tickets are not flushed automatically on password change. Resolution: Run 'klist purge' on the client machine, then re-authenticate.",
+    "metadata": {"priority": "high", "status": "resolved", "category": "VPN"}
+  },
+  {
+    "doc_id": "ALPHA-TKT-002",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "ticket",
+    "title": "Laptop screen flickering on dock",
+    "content": "Multiple users report external monitor flickering when docked. Affected hardware: Dell Latitude 5540 with Thunderbolt dock. Flickering occurs at resolutions above 1080p. Workaround: Downgrade display driver to version 30.0.15063.6010. Root cause: Display driver 31.x has a regression with Thunderbolt 4 docks at 4K. Permanent fix: Apply KB5028997 hotfix from vendor.",
+    "metadata": {"priority": "medium", "status": "resolved", "category": "Hardware"}
+  },
+  {
+    "doc_id": "ALPHA-TKT-003",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "ticket",
+    "title": "Email delivery delays to external recipients",
+    "content": "Outbound emails to external domains are delayed by 20-30 minutes. Affected: all @contoso-retail.example.com senders. Investigation found SPF record misconfiguration — the IP range 203.0.113.0/24 was added to Exchange Online but not to the public DNS SPF TXT record. Fix: Updated SPF record to include ip4:203.0.113.0/24. Verification: Send test email and confirm receipt within 2 minutes.",
+    "metadata": {"priority": "high", "status": "resolved", "category": "Email"}
+  },
+  {
+    "doc_id": "ALPHA-TKT-004",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "ticket",
+    "title": "Printer offline after network VLAN migration",
+    "content": "Floor 3 HP LaserJet Pro M428 shows offline after VLAN 20 was migrated to VLAN 30 on 2024-01-15. Printer IP 10.20.0.45 is no longer reachable. Resolution: Reconfigure printer static IP to 10.30.0.45, update DNS A record for printer.contoso-retail.example.com, and re-add printer on affected workstations using the new IP.",
+    "metadata": {"priority": "medium", "status": "resolved", "category": "Network"}
+  },
+  {
+    "doc_id": "ALPHA-KB-001",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "kb_article",
+    "title": "VPN Access Setup Guide (DEPRECATED — superseded by ALPHA-KB-002)",
+    "content": "DEPRECATED ARTICLE — This guide describes the legacy Cisco AnyConnect VPN setup. Use ALPHA-KB-002 for current instructions. Legacy steps: 1) Download Cisco AnyConnect 4.9 from the intranet portal at http://intranet.contoso-retail.example.com/vpn-legacy. 2) Enter server address vpn-old.contoso-retail.example.com. 3) Authenticate with your domain username and static password. NOTE: This endpoint was decommissioned on 2024-03-01. All connections will be refused.",
+    "metadata": {"status": "deprecated", "replaced_by": "ALPHA-KB-002", "category": "VPN"}
+  },
+  {
+    "doc_id": "ALPHA-KB-002",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "kb_article",
+    "title": "VPN Access Setup Guide (Current — GlobalProtect)",
+    "content": "Current VPN setup guide. Use Palo Alto GlobalProtect client, not Cisco AnyConnect. 1) Download GlobalProtect from https://vpn.contoso-retail.example.com/globalprotect (requires on-network or existing VPN). 2) Set gateway to vpn.contoso-retail.example.com. 3) Authenticate with your domain credentials plus MFA (Microsoft Authenticator). 4) If you receive error GP-0019, your device certificate may be expired — contact the help desk to re-enrol your device. This guide supersedes ALPHA-KB-001.",
+    "metadata": {"status": "current", "replaces": "ALPHA-KB-001", "category": "VPN"}
+  },
+  {
+    "doc_id": "ALPHA-LOG-001",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "log",
+    "title": "Exchange gateway SMTP log 2024-06-10",
+    "content": "2024-06-10T08:14:22Z WARN smtp-gw-01 SPF_FAIL sender=noreply@contoso-retail.example.com ip=203.0.113.52 result=SoftFail\n2024-06-10T08:14:23Z INFO smtp-gw-01 Message queued for retry in 1800s\n2024-06-10T09:45:00Z INFO smtp-gw-01 SPF record updated, re-testing\n2024-06-10T09:45:03Z INFO smtp-gw-01 SPF_PASS sender=noreply@contoso-retail.example.com ip=203.0.113.52",
+    "metadata": {"source": "smtp-gw-01", "category": "Email", "date": "2024-06-10"}
+  },
+  {
+    "doc_id": "ALPHA-LOG-002",
+    "tenant_id": "tenant_alpha",
+    "doc_type": "log",
+    "title": "VPN authentication failures log 2024-06-12",
+    "content": "2024-06-12T07:30:11Z ERROR vpn-gw-01 AUTH_FAIL user=jsmith@contoso-retail.example.com reason=\"Kerberos ticket expired\"\n2024-06-12T07:31:05Z ERROR vpn-gw-01 AUTH_FAIL user=jsmith@contoso-retail.example.com reason=\"Kerberos ticket expired\"\n2024-06-12T07:35:22Z INFO vpn-gw-01 AUTH_SUCCESS user=jsmith@contoso-retail.example.com reason=\"Token re-provisioned by helpdesk\"",
+    "metadata": {"source": "vpn-gw-01", "category": "VPN", "date": "2024-06-12"}
+  }
+]
