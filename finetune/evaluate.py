@@ -12,7 +12,7 @@ from pathlib import Path
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import PeftModel
-from rouge_score import rouge_scorer
+import evaluate as hf_evaluate
 
 BASE_MODEL = "microsoft/phi-2"
 ADAPTED_DIR = Path(__file__).parent / "checkpoints" / "phi2-qlora"
@@ -56,19 +56,16 @@ def keyword_accuracy(predictions: list[str], references: list[str]) -> float:
     return correct / len(predictions) if predictions else 0.0
 
 def evaluate_model(model, tokenizer, examples: list[dict]) -> dict:
-    scorer = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
+    rouge = hf_evaluate.load("rouge")
     predictions, references = [], []
     for ex in examples:
         prompt = format_prompt(ex)
         pred = generate(model, tokenizer, prompt)
         predictions.append(pred)
         references.append(ex["output"])
-    rouge_scores = [
-        scorer.score(ref, pred)["rougeL"].fmeasure
-        for pred, ref in zip(predictions, references)
-    ]
+    rouge_scores = rouge.compute(predictions=predictions, references=references)
     return {
-        "rouge_l": round(sum(rouge_scores) / len(rouge_scores), 4),
+        "rouge_l": round(rouge_scores["rougeL"], 4),
         "keyword_accuracy": round(keyword_accuracy(predictions, references), 4),
         "n_examples": len(examples),
     }
