@@ -34,7 +34,7 @@ Client Request (X-API-Key header)
 |   [3] RAG Pipeline                    |
 |       |                               |
 |       +-- Embeddings                  |
-|       |   (all-MiniLM-L6-v2)         |
+|       |   (all-MiniLM-L6-v2)          |
 |       |                               |
 |       +-- ChromaDB                    |
 |       |   Per-tenant collections      |
