@@ -15,53 +15,74 @@ Each tenant (customer) ingests their own IT support documents — tickets, logs,
 ### RAG Service
 
 ```
-User / Client
-     │
-     ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        FastAPI App                          │
-│                                                             │
-│  ┌──────────────────┐    ┌──────────────────────────────┐  │
-│  │   Auth Layer     │    │       Security Layer         │  │
-│  │  (API Key →      │───▶│  (Prompt-injection detection │  │
-│  │   Tenant ID)     │    │   + XML source tagging)      │  │
-│  └──────────────────┘    └──────────────────────────────┘  │
-│                                    │                        │
-│                                    ▼                        │
-│                        ┌───────────────────────┐           │
-│                        │      RAG Pipeline     │           │
-│                        └───────────────────────┘           │
-│                          /         |          \             │
-│            ┌────────────▼──┐  ┌───▼───────┐  ┌──▼──────┐  │
-│            │  Embeddings   │  │ ChromaDB  │  │  Ollama  │  │
-│            │ all-MiniLM-   │  │ Per-tenant│  │ command- │  │
-│            │  L6-v2        │  │collections│  │  r:35b   │  │
-│            └───────────────┘  └───────────┘  └─────────┘  │
-└─────────────────────────────────────────────────────────────┘
+Client Request (X-API-Key header)
+        |
+        v
++---------------------------------------+
+|            FastAPI App                |
+|                                       |
+|   [1] Auth Layer                      |
+|       API Key --> Tenant ID mapping   |
+|       Rejects unknown keys (401)      |
+|       Rejects tenant mismatch (403)   |
+|                                       |
+|   [2] Security Layer                  |
+|       Prompt-injection detection      |
+|       Rejects suspicious input (400)  |
+|       XML source tagging              |
+|                                       |
+|   [3] RAG Pipeline                    |
+|       |                               |
+|       +-- Embeddings                  |
+|       |   (all-MiniLM-L6-v2)         |
+|       |                               |
+|       +-- ChromaDB                    |
+|       |   Per-tenant collections      |
+|       |   (tenant_alpha, tenant_beta) |
+|       |                               |
+|       +-- Ollama                      |
+|           command-r:35b               |
+|           (local GPU server)          |
++---------------------------------------+
+        |
+        v
+  JSON Response
+  (answer + sources + confidence)
 ```
 
 ### Fine-tuning Path (separate from the service)
 
 ```
-phi-2 base model
-      │
-      ▼
-┌─────────────────┐
-│  QLoRA (PEFT)   │  ◀── finetune/dataset_train.jsonl (85 examples)
-│  train.py       │
-└─────────────────┘
-      │
-      ▼
-  LoRA adapter
-  checkpoint
-      │
-      ▼
-┌─────────────────┐
-│  evaluate.py    │  ◀── finetune/dataset_eval.jsonl (25 examples)
-└─────────────────┘
-      │
-      ▼
-  baseline vs. adapted ROUGE-L + keyword accuracy
+microsoft/phi-2 (base model, 2.7B params)
+        |
+        v
++---------------------------+
+|  QLoRA Training           |
+|  train.py                 |
+|  - 4-bit NF4 quantisation |
+|  - LoRA r=16, alpha=32    |
+|  - 2 epochs               |
++---------------------------+
+        |  uses
+        +-- finetune/dataset_train.jsonl (85 examples)
+        |
+        v
+  LoRA adapter checkpoint
+  (finetune/checkpoints/phi2-qlora/)
+        |
+        v
++---------------------------+
+|  Evaluation               |
+|  evaluate.py              |
+|  - ROUGE-L score          |
+|  - Keyword accuracy       |
++---------------------------+
+        |  uses
+        +-- finetune/dataset_eval.jsonl (25 examples)
+        |
+        v
+  baseline phi-2  vs.  adapted phi-2
+  (side-by-side results)
 ```
 
 ---
