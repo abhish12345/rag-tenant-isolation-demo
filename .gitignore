@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+*.egg-link
+.installed.cfg
+lib/
+lib64/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env
+!.env.example
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.xml
+
+# ChromaDB persistent data
+chroma_data/
+chroma_db/
+*.chroma/
+
+# Model checkpoints & weights
+checkpoints/
+*.bin
+*.safetensors
+*.gguf
+*.ggml
+*.pt
+*.pth
+
+# Hugging Face cache
+.cache/
+~/.cache/huggingface/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ruff / linting
+.ruff_cache/
+
+# Workflow agent artifacts
+.agents/
